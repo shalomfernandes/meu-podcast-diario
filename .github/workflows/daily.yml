@@ -16,10 +16,9 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11' # ATUALIZADO PARA VERSÃO MAIS NOVA
+          python-version: '3.11'
 
       - name: Install dependencies
-        # O comando --upgrade garante que pegue a versão mais recente que corrige o erro 401
         run: pip install --upgrade -r requirements.txt
 
       - name: Run Podcast Generator
@@ -33,4 +32,6 @@ jobs:
           git config --global user.email 'bot@noreply.github.com'
           git add .
           git commit -m "Novo episódio diário" || exit 0
+          # --- A CORREÇÃO ESTÁ AQUI EMBAIXO ---
+          git pull --rebase origin main
           git push
