@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+  <channel>
+    <title>Goiás & Brasil Diário</title>
+    <description>Resumo diário aprofundado de notícias locais, nacionais e internacionais.</description>
+    <link>https://yurileonardos.github.io/meu-podcast-diario</link>
+    <language>pt-br</language>
+    <itunes:image href="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/640px-Flag_of_Brazil.svg.png"/>
+    
+    <item>
+      <title>Edição Completa: 03/12</title>
+      <description>Notícias completas de Goiás, Brasil e Mundo. Fontes: G1, ICL, 247, Opção e mais.</description>
+      <enclosure url="https://yurileonardos.github.io/meu-podcast-diario/podcast_completo_20251203.mp3" type="audio/mpeg" />
+      <guid isPermaLink="true">https://yurileonardos.github.io/meu-podcast-diario/podcast_completo_20251203.mp3</guid>
+      <pubDate>Wed, 03 Dec 2025 11:33:55 -0300</pubDate>
+    </item>
+    
+  </channel>
+</rss>
