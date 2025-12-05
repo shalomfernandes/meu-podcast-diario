@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
   <channel>
     <title>Resumo Diario do Yuri</title>
-    <description>Notícias aprofundadas.</description>
+    <description>Notícias personalizadas.</description>
     <link>https://yurileonardos.github.io/meu-podcast-diario</link>
     <language>pt-br</language>
     <itunes:image href="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/640px-Flag_of_Brazil.svg.png"/>
 
     <item>
       <title>Resumo 05/12</title>
-      <description>Edição Completa e Aprofundada para Yuri.</description>
+      <description>Resumo diário para Yuri.</description>
       <enclosure url="https://yurileonardos.github.io/meu-podcast-diario/podcast_20251205.mp3" type="audio/mpeg" />
       <guid isPermaLink="true">https://yurileonardos.github.io/meu-podcast-diario/podcast_20251205.mp3</guid>
-      <pubDate>Fri, 05 Dec 2025 16:31:15 -0300</pubDate>
+      <pubDate>Fri, 05 Dec 2025 17:15:15 -0300</pubDate>
     </item>
     
   </channel>
