@@ -7,39 +7,35 @@ from datetime import datetime
 import pytz
 from xml.sax.saxutils import escape
 import re
+import urllib.request
 
 # --- CONFIGURAÇÕES DO USUÁRIO ---
-GITHUB_USER = "yurileonardos"  # <--- COLOQUE SEU USUÁRIO GITHUB AQUI
+GITHUB_USER = "yurileonardos"
 REPO_NAME = "meu-podcast-diario"
 BASE_URL = f"https://{GITHUB_USER}.github.io/{REPO_NAME}"
 
-# --- MEGABANCO DE FONTES (Curadoria Yuri Completa) ---
+# --- 1. FONTES CONVERTIDAS PARA RSS (ROBÔ) ---
 FEEDS = {
-    "GOIÁS (Cotidiano, Clima, Política)": [
+    "GOIÁS E GOIÂNIA": [
         "https://g1.globo.com/rss/g1/goias/",
         "https://www.jornalopcao.com.br/feed/",
         "https://www.maisgoias.com.br/feed/",
         "https://opopular.com.br/rss",
         "https://www.dm.com.br/feed",
-        "https://opopular.com.br/",
-        "https://diariodegoias.com.br/",
-        "https://ohoje.com/",
-        "https://www.climatempo.com.br/previsao-do-tempo/15-dias/cidade/88/goiania-go",
-        "https://g1.globo.com/previsao-do-tempo/go/goiania.ghtml"
-        
+        "https://diariodegoias.com.br/feed/",
+        "https://ohoje.com/feed/"
     ],
     "ESPORTES (Vila Nova & Cruzeiro)": [
         "https://ge.globo.com/rss/ge/futebol/times/vila-nova/",   
         "https://ge.globo.com/rss/ge/futebol/times/cruzeiro/",
         "https://www.maisgoias.com.br/category/esportes/vila-nova/feed/"
     ],
-    "CONCURSOS E OPORTUNIDADES": [
+    "CONCURSOS": [
         "https://g1.globo.com/rss/g1/concursos-e-emprego/",
         "https://jcconcursos.com.br/rss/noticias",
-        "https://www.pciconcursos.com.br/"
-        
+        "https://www.pciconcursos.com.br/feed"
     ],
-    "BRASIL (Política, Justiça, Social, Economia)": [
+    "BRASIL (Política, Economia, Social)": [
         "https://rss.uol.com.br/feed/noticias.xml",
         "https://feeds.folha.uol.com.br/poder/rss091.xml",
         "https://www.estadao.com.br/rss/politica",
@@ -49,31 +45,18 @@ FEEDS = {
         "https://agenciabrasil.ebc.com.br/rss/ultimas-noticias/feed.xml",
         "https://www.camara.leg.br/noticias/rss/ultimas-noticias",
         "https://www12.senado.leg.br/noticias/feed/todas/rss",
-        "https://www.globo.com/",
-        "https://iclnoticias.com.br/",
-        "https://veja.abril.com.br/",
-        "https://exame.com/",
-        "https://exame.com/negocios/",
-        "https://valor.globo.com/especiais/",
-        "https://www.estadao.com.br/?srsltid=AfmBOoqR1gXuWZuc81g-4O8WRqKbCcTkE_jqUgiT4KXkolcze2jlEiLU",
-        "https://elpais.com/america/",
-        "https://noticias.uol.com.br/",
-        "https://www.seudinheiro.com/",
-        "https://agenciabrasil.ebc.com.br/",
-        "https://piaui.folha.uol.com.br/",
-        "https://www.infomoney.com.br/",
-        "https://www.reuters.com/",
-        "https://apnews.com/",
-        "https://www.correiobraziliense.com.br/",
-        "https://www.youtube.com/@desmascarandooficial",
-        "https://www.youtube.com/@InstitutoConhecimentoLiberta",
-        "https://www.gazetadopovo.com.br/",
-        "https://www.folha.uol.com.br/",
-        "https://www.bbc.com/portuguese",
-        "https://www.metropoles.com/",
-        "https://www.youtube.com/watch?v=nUG_py5XcS8&list=PL5DFl3pSRD_9TJB8i1IHZfl63rfF0DrcH"
-        
-        
+        "https://iclnoticias.com.br/feed/",
+        "https://veja.abril.com.br/feed/",
+        "https://exame.com/feed/",
+        "https://exame.com/negocios/feed/",
+        "https://valor.globo.com/rss/",
+        "https://www.seudinheiro.com/feed/",
+        "https://piaui.folha.uol.com.br/feed/",
+        "https://www.infomoney.com.br/feed/",
+        "https://www.correiobraziliense.com.br/rss/noticia/brasil.xml",
+        "https://www.gazetadopovo.com.br/feed/",
+        "https://www.metropoles.com/feed",
+        "https://www.em.com.br/rss/noticia/nacional/"
     ],
     "MUNDO (Geopolítica Global)": [
         "https://brasil.elpais.com/rss/elpais/america.xml",      
@@ -82,73 +65,78 @@ FEEDS = {
         "https://news.un.org/feed/subscribe/pt/news/all/rss.xml", 
         "https://rss.nytimes.com/services/xml/rss/nyt/World.xml", 
         "https://www.theguardian.com/world/rss",
-        "https://iclnoticias.com.br/",
-        "https://www.globo.com/",
-        "https://cartacapital.com.br/feed/",
-        "https://www.uol.com.br/",
-        "https://rss.uol.com.br/feed/noticias.xml",
-        "https://feeds.folha.uol.com.br/poder/rss091.xml",
-        "https://www.estadao.com.br/rss/politica",
-        "https://www.cnnbrasil.com.br/feed/",
-        "https://www.brasil247.com/feed",
-        "https://www.clarin.com/",
-        "https://pt.euronews.com/noticias/internacional",
-        "https://www.cnnbrasil.com.br/internacional/",
-        "https://exame.com/pagina-especial/exame-international/",
-        "https://www.estadao.com.br/blogs-e-colunas/busca/?token={%22ed%22:%22internacional%22}",
-        "https://elpais.com/america/",
-        "https://noticias.uol.com.br/",
-        "https://piaui.folha.uol.com.br/",
-        "https://www.reuters.com/",
-        "https://apnews.com/",
-        "https://www.dw.com/pt-br/not%C3%ADcias/s-7111",
-        "https://www.theguardian.com/international",
-        "https://www.em.com.br/",
-        "https://forbes.com.br/",
-        "https://www.ft.com/"
-        
+        "https://www.clarin.com/rss/lo-ultimo/",
+        "https://pt.euronews.com/rss?format=xml",
+        "https://forbes.com.br/feed/",
+        "https://www.ft.com/rss/home"
     ],
-    "CIÊNCIA, TECNOLOGIA, IA, LITERATURA, CULTURA, ARTE E SAÚDE": [
+    "CIÊNCIA, TECNOLOGIA E CULTURA": [
         "https://super.abril.com.br/feed/",
-        "https://exame.com/feed/",
         "https://gizmodo.uol.com.br/feed/",
         "https://www.nature.com/nature.rss",
-        "https://exame.com/inteligencia-artificial/",
-        "https://quatrocincoum.com.br/",
-        "https://cbl.org.br/quem-somos/#associacao",
-        "https://www.academia.org.br/",
-        "https://www.abc.org.br/",
-        "https://www.gov.br/cultura/pt-br",
-        "https://mapa.cultura.gov.br/",
-        "https://www1.folha.uol.com.br/ilustrada/",
-        "https://www.estadao.com.br/cultura/?srsltid=AfmBOorJbjPG5hLABb6xXkgBh013yAX6hBPFbLNnVDqYU9Sc-mAgFNLN",
-        "https://www.reuters.com/",
-        "https://apnews.com/",
-        "https://saude.abril.com.br/",
-        "https://www1.folha.uol.com.br/equilibrioesaude/"
+        "https://quatrocincoum.com.br/feed/",
+        "https://www.abc.org.br/feed/",
+        "https://www.gov.br/cultura/pt-br/rss.xml",
+        "https://feeds.folha.uol.com.br/ilustrada/rss091.xml",
+        "https://saude.abril.com.br/feed/"
+    ],
+    "YOUTUBE (Canais Específicos)": [
+        "https://www.youtube.com/feeds/videos.xml?channel_id=UCO6j6cqBhi2TWVxfcn6t23w", # Desmascarando
+        "https://www.youtube.com/feeds/videos.xml?channel_id=UC6w8cK5C5QZJ9J9J9J9J9J9", # ICL Canal
+        "https://www.youtube.com/feeds/videos.xml?playlist_id=PL5DFl3pSRD_9TJB8i1IHZfl63rfF0DrcH" # ICL Playlist
     ]
 }
 
+# --- 2. LINKS ESPECIAIS (CLIMA) ---
+WEATHER_URLS = [
+    "https://www.climatempo.com.br/previsao-do-tempo/15-dias/cidade/88/goiania-go",
+    "https://g1.globo.com/previsao-do-tempo/go/goiania.ghtml"
+]
+
+# --- 3. FERRAMENTAS ---
+def get_data_ptbr():
+    now = datetime.now(pytz.timezone('America/Sao_Paulo'))
+    dias = ['segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado', 'domingo']
+    meses = ['', 'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro']
+    return f"{now.day} de {meses[now.month]}, uma {dias[now.weekday()]}"
+
+def get_weather_data():
+    text_data = "\n--- PREVISÃO DO TEMPO EM GOIÂNIA (Dados Brutos) ---\n"
+    print("Consultando sites de clima...")
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    for url in WEATHER_URLS:
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req) as response:
+                html = response.read().decode('utf-8')
+                clean = re.sub(r'<[^>]+>', ' ', html)
+                clean = re.sub(r'\s+', ' ', clean)
+                text_data += f"Fonte ({url}): {clean[:1000]}...\n"
+        except: continue
+    return text_data
+
 def get_news_summary():
     texto_final = ""
-    print("Coletando notícias de todas as áreas...")
+    print("Coletando notícias RSS...")
     for categoria, urls in FEEDS.items():
         texto_final += f"\n--- {categoria} ---\n"
         for url in urls:
             try:
                 feed = feedparser.parse(url)
-                # Pega 3 notícias de cada para garantir variedade sem estourar limite
-                for entry in feed.entries[:3]:
+                # Pega 2 notícias de cada para não estourar o tamanho
+                for entry in feed.entries[:2]:
                     title = entry.title
                     summary = entry.summary if 'summary' in entry else ""
-                    summary = re.sub(r'<[^>]+>', '', summary)[:250]
+                    summary = re.sub(r'<[^>]+>', '', summary)[:200]
                     
-                    source_name = "Fonte Desconhecida"
+                    source_name = "Fonte"
                     if 'source' in entry: source_name = entry.source.title
                     elif 'feed' in feed and 'title' in feed.feed: source_name = feed.feed.title
                     
                     texto_final += f"[{source_name}] {title}: {summary}\n"
             except: continue
+            
+    texto_final += get_weather_data()
     return texto_final
 
 def clean_text_for_speech(text):
@@ -175,50 +163,42 @@ def make_script(news_text):
 
     try:
         model = genai.GenerativeModel(model_name)
-        data_hoje = datetime.now(pytz.timezone('America/Sao_Paulo')).strftime('%d de %B')
+        data_hoje_extenso = get_data_ptbr()
         
-        # PROMPT COMPLETO COM TODOS OS REQUISITOS DO YURI
         prompt = f"""
-        Você é o âncora pessoal do Yuri. Data: {data_hoje}.
+        Você é o âncora pessoal do Yuri. 
+        Data de hoje: {data_hoje_extenso}.
         
-        SUA MISSÃO: Cruzar informações de várias fontes e criar um resumo rico e sério.
+        1. SAUDAÇÃO OBRIGATÓRIA: "Olá, bom dia Yuri! Hoje é {data_hoje_extenso}."
         
-        1. SAUDAÇÃO: "Olá, bom dia Yuri! Aqui é o seu resumo diário de notícias. Hoje é {data_hoje}." (Cite o nome APENAS aqui).
+        2. FILTRO NEGATIVO (O QUE NÃO FALAR):
+           - PROIBIDO falar de acidentes de trânsito, crimes comuns, roubos, assassinatos isolados ou tragédias irrelevantes.
+           - Se a notícia for "acidente na ponte", IGNORE.
+           - Foque no MACRO: Políticas Públicas, Economia, Decisões de Governo, Inovação.
         
-        2. BLOCOS OBRIGATÓRIOS (Aborde todos se houver notícias):
+        3. ROTEIRO OBRIGATÓRIO:
            
-           - GOIÂNIA & GOIÁS :
-             * Foco total em: Políticas públicas municipais/estaduais, ações dos Governo: Municipal (Prefeitura) e Estadual (Estadual).
-             * Questões sociais, educação e saúde em Goiás.
-             * CLIMA: Se houver informação nas fontes locais, informe a previsão do tempo para Goiânia.
+           - CLIMA EM GOIÂNIA:
+             * Procure no texto bruto os dados do Climatempo/G1. Diga a temperatura máxima/mínima e se vai chover.
+           
+           - GOIÂNIA & GOIÁS:
+             * Políticas públicas (Prefeitura/Estado), obras e sociedade.
            
            - ESPORTE (VILA NOVA & CRUZEIRO):
-             * Prioridade absoluta para o Tigrão (Vila) e a Raposa (Cruzeiro).
-             * Ignore outros times.
+             * Fale do Tigrão (Vila) e da Raposa (Cruzeiro).
+             * Se não tiver jogo, fale dos bastidores ou contratações.
            
-           - BRASIL (POLÍTICA & SOCIEDADE):
-             * Ações de Estado, Justiça, Segurança Pública e Economia.
-             * Mercado de trabalho e Questões Sociais.
-                       
-           - OPORTUNIDADES:
-             * CONCURSOS PÚBLICOS: Destaque editais abertos ou notícias relevantes de carreira.
+           - BRASIL & MUNDO:
+             * Resumo sério de política, economia e geopolítica.
+             * Cruze as informações das fontes (ex: NY Times com BBC).
            
-           - INOVAÇÃO & FUTURO & CULTURA & SAÚDE:
-             * Inteligência Artificial, Tecnologia, Ciência e Inovação.
-             * Cultura e Prêmios de Reconhecimento.
-             * Saúde.
-           
-           - MUNDO (GEOPOLÍTICA):
-             * Panorama global (Américas, Europa, África, Ásia). Traduza e resuma as fontes internacionais.
+           - OPORTUNIDADES & CULTURA:
+             * Concursos públicos abertos.
+             * Inovação e Ciência.
         
-        3. DESPEDIDA: "Espero que tenha gostado. Um ótimo dia e até amanhã!"
+        4. DESPEDIDA: "Espero que tenha gostado. Um ótimo dia e até amanhã!"
         
-        ESTILO:
-        - Tom de conversa inteligente.
-        - Cruze as fontes (ex: "Enquanto a Folha diz X, a Gazeta aponta Y").
-        - Seja direto e informativo.
-        
-        DADOS BRUTOS:
+        DADOS BRUTOS PARA ANÁLISE:
         {news_text}
         """
         
@@ -245,7 +225,7 @@ def update_rss(audio_filename, title):
     rss_item = f"""
     <item>
       <title>{safe_title}</title>
-      <description>Resumo diário completo: Goiás, Vila, Cruzeiro, Política, Concursos e Mundo.</description>
+      <description>Resumo diário completo para Yuri.</description>
       <enclosure url="{audio_url}" type="audio/mpeg" />
       <guid isPermaLink="true">{audio_url}</guid>
       <pubDate>{now.strftime("%a, %d %b %Y %H:%M:%S %z")}</pubDate>
