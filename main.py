@@ -104,7 +104,8 @@ FEEDS = {
         "https://www.dw.com/pt-br/not%C3%ADcias/s-7111",
         "https://www.theguardian.com/international",
         "https://www.em.com.br/",
-        "https://forbes.com.br/"
+        "https://forbes.com.br/",
+        "https://www.ft.com/"
         
     ],
     "CIÊNCIA, TECNOLOGIA, IA, LITERATURA, CULTURA, ARTE E SAÚDE": [
