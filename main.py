@@ -50,7 +50,7 @@ FEEDS = {
         "https://piaui.folha.uol.com.br/feed/",
         "https://www.metropoles.com/feed"
     ],
-    "MUNDO (Geopolítica Profunda)": [
+    "MUNDO (Geopolítica)": [
         "https://brasil.elpais.com/rss/elpais/america.xml",      
         "https://www.bbc.com/portuguese/index.xml",              
         "https://rss.dw.com/xml/rss-br-all",                     
@@ -60,7 +60,7 @@ FEEDS = {
         "https://www.clarin.com/rss/lo-ultimo/",
         "https://pt.euronews.com/rss?format=xml"
     ],
-    "CIÊNCIA, TECNOLOGIA E SAÚDE": [
+    "CIÊNCIA E TECNOLOGIA": [
         "https://super.abril.com.br/feed/",
         "https://gizmodo.uol.com.br/feed/",
         "https://www.nature.com/nature.rss",
@@ -72,7 +72,7 @@ FEEDS = {
     ]
 }
 
-# --- LINKS DO INMET/CLIMATEMPO (HTML) ---
+# --- LINKS DO INMET/CLIMATEMPO ---
 WEATHER_URLS = [
     "https://portal.inmet.gov.br/", 
     "https://www.climatempo.com.br/previsao-do-tempo/15-dias/cidade/88/goiania-go"
@@ -85,7 +85,7 @@ def get_data_ptbr():
     return f"{now.day} de {meses[now.month]}, uma {dias[now.weekday()]}"
 
 def get_weather_data():
-    text_data = "\n--- DADOS DE CLIMA (INMET/CLIMATEMPO) ---\n"
+    text_data = "\n--- DADOS DE CLIMA ---\n"
     print("Consultando INMET...")
     headers = {'User-Agent': 'Mozilla/5.0'}
     for url in WEATHER_URLS:
@@ -93,7 +93,6 @@ def get_weather_data():
             req = urllib.request.Request(url, headers=headers)
             with urllib.request.urlopen(req) as response:
                 html = response.read().decode('utf-8')
-                # Pega mais conteúdo do HTML para garantir que pegamos a previsão
                 clean = re.sub(r'<[^>]+>', ' ', html)
                 clean = re.sub(r'\s+', ' ', clean)
                 text_data += f"Fonte ({url}): {clean[:4000]}...\n"
@@ -102,24 +101,22 @@ def get_weather_data():
 
 def get_news_summary():
     texto_final = ""
-    print("Coletando notícias (Modo Aprofundado)...")
+    print("Coletando notícias...")
     for categoria, urls in FEEDS.items():
         texto_final += f"\n--- {categoria} ---\n"
         for url in urls:
             try:
                 feed = feedparser.parse(url)
-                # AUMENTO DE VOLUME: Pega 4 notícias e MUITO mais texto de cada uma
+                # Pega 4 notícias com texto expandido (1000 chars) para ter conteúdo
                 for entry in feed.entries[:4]:
                     title = entry.title
-                    # Tenta pegar o conteúdo completo se disponível, senão o resumo
                     content = entry.summary
                     if 'content' in entry:
                         content = entry.content[0].value
                     
-                    # AUMENTO DE LIMITE: 1500 caracteres por notícia (antes era 200)
-                    summary = re.sub(r'<[^>]+>', '', content)[:1500]
-                    
+                    summary = re.sub(r'<[^>]+>', '', content)[:1000]
                     published = entry.published if 'published' in entry else "Data Recente"
+                    
                     source_name = "Fonte"
                     if 'source' in entry: source_name = entry.source.title
                     elif 'feed' in feed and 'title' in feed.feed: source_name = feed.feed.title
@@ -133,10 +130,10 @@ def get_news_summary():
 def clean_text_for_speech(text):
     text = text.replace("*", "")
     text = text.replace("#", "")
-    text = re.sub(r'\[.*?\]', '', text)
+    text = re.sub(r'\[.*?\]', '', text) # Remove [Música], [Aplausos]
+    text = re.sub(r'\(.*?\)', '', text) # Remove (risos), (nota do editor)
     text = re.sub(r'http\S+', '', text)
     text = text.replace("BRL", "reais")
-    text = text.replace("USD", "dólares")
     return text
 
 def make_script(news_text):
@@ -156,55 +153,32 @@ def make_script(news_text):
         model = genai.GenerativeModel(model_name)
         data_hoje_extenso = get_data_ptbr()
         
-        # --- PROMPT "PROGRAMA DE RÁDIO LONGO" ---
+        # --- PROMPT CORRIGIDO: FLUIDEZ E SEM META-LINGUAGEM ---
         prompt = f"""
-        ATUE COMO: Um âncora de rádio inteligente, profundo e detalhista.
-        OUVINTE: Yuri.
-        DATA: {data_hoje_extenso}.
-        OBJETIVO: Criar um podcast LONGO (mais de 10 minutos de leitura).
+        Você é um âncora de rádio gravando para o ouvinte Yuri.
+        Data: {data_hoje_extenso}.
         
-        INSTRUÇÕES DE PERSONALIDADE:
-        - NÃO SEJA RESUMIDO. O Yuri quer detalhes. Explique o "porquê" das coisas.
-        - Fale devagar, use pausas e conectivos de qualidade ("Analisando profundamente...", "Isso impacta diretamente...").
-        - Se a notícia for de dias atrás (especialmente Esporte), traga ela à tona e analise o contexto atual.
+        INSTRUÇÕES DE FALA (CRUCIAL):
+        1. Fale APENAS o texto que vai para o ar.
+        2. NÃO descreva o que vai fazer (EX: "Agora vou falar de..."). Apenas fale.
+        3. NÃO use palavras como "Música", "Vinheta", "Locutor", "Bloco".
+        4. NÃO explique a estrutura do programa.
+        5. Fale de forma fluída, conectando os assuntos naturalmente.
         
-        ROTEIRO OBRIGATÓRIO (Cubra TODOS os pontos com calma):
+        SAUDAÇÃO EXATA:
+        "Olá, bom dia Yuri! Hoje é {data_hoje_extenso}. Vamos às notícias."
         
-        1. ABERTURA:
-           - "Olá, bom dia Yuri! Hoje é {data_hoje_extenso}. Prepare-se para um mergulho profundo nas notícias."
+        CONTEÚDO OBRIGATÓRIO (Nessa ordem, mas sem anunciar os títulos):
+        1. CLIMA EM GOIÂNIA (Dados do INMET/Climatempo).
+        2. VILA NOVA E CRUZEIRO (Fale das últimas notícias, mesmo se forem de ontem. Analise o momento dos times).
+        3. GOIÁS E CIDADES (Política e cotidiano).
+        4. BRASIL E MUNDO (Política, Economia, Guerras/Conflitos atuais).
+        5. CIÊNCIA/INOVAÇÃO/CONCURSOS.
         
-        2. CLIMA EM GOIÂNIA (Análise Completa):
-           - Leia os dados brutos do INMET/Climatempo abaixo.
-           - Informe temperatura máxima/mínima, umidade, ventos e probabilidade de chuva.
-           - Dê dicas (ex: "Leve guarda-chuva", "Hidrate-se").
+        DESPEDIDA EXATA:
+        "Espero que tenha gostado, Yuri. Um ótimo dia e até amanhã!"
         
-        3. ESPORTE - VILA NOVA & CRUZEIRO (Bloco Especial):
-           - Destaque TOTAL para o Tigrão e a Raposa.
-           - Se não houver jogo hoje, fale das contratações, do treino da semana, da situação na tabela.
-           - Invente análises baseadas nos fatos: "O técnico precisa ajustar a defesa...", etc.
-        
-        4. GOIÁS & CIDADES (Política e Social):
-           - Aprofunde nas decisões do Governo Estadual e Prefeitura.
-           - Comente obras, trânsito e questões sociais.
-        
-        5. BRASIL - POLÍTICA & ECONOMIA (Bloco Denso):
-           - Não leia manchetes. Explique as intrigas do Congresso, as decisões do STF e o impacto econômico.
-           - Cruze fontes: O que a esquerda e a direita estão dizendo?
-        
-        6. CENÁRIO INTERNACIONAL (Geopolítica):
-           - Fale da Guerra na Ucrânia, Oriente Médio ou tensões nos EUA/China.
-           - Explique o impacto global desses conflitos.
-        
-        7. CIÊNCIA, SAÚDE & TECNOLOGIA:
-           - Escolha uma notícia de avanço médico ou tecnológico e explique como isso muda o futuro.
-        
-        8. OPORTUNIDADES:
-           - Cite concursos abertos relevantes.
-        
-        9. DESPEDIDA:
-           - "Espero que tenha gostado desta análise completa, Yuri. Um ótimo dia e até amanhã!"
-        
-        DADOS BRUTOS (Use isso para criar sua análise):
+        DADOS BRUTOS:
         {news_text}
         """
         
@@ -231,7 +205,7 @@ def update_rss(audio_filename, title):
     rss_item = f"""
     <item>
       <title>{safe_title}</title>
-      <description>Edição Completa e Aprofundada para Yuri.</description>
+      <description>Resumo diário para Yuri.</description>
       <enclosure url="{audio_url}" type="audio/mpeg" />
       <guid isPermaLink="true">{audio_url}</guid>
       <pubDate>{now.strftime("%a, %d %b %Y %H:%M:%S %z")}</pubDate>
@@ -242,7 +216,7 @@ def update_rss(audio_filename, title):
 <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
   <channel>
     <title>Resumo Diario do Yuri</title>
-    <description>Notícias aprofundadas.</description>
+    <description>Notícias personalizadas.</description>
     <link>{BASE_URL}</link>
     <language>pt-br</language>
     <itunes:image href="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/640px-Flag_of_Brazil.svg.png"/>
