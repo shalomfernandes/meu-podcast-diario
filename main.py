@@ -10,11 +10,11 @@ import re
 import urllib.request
 
 # --- CONFIGURAÇÕES DO USUÁRIO ---
-GITHUB_USER = "yurileonardos"  # <--- SEU USUÁRIO AQUI
+GITHUB_USER = "yurileonardos"
 REPO_NAME = "meu-podcast-diario"
 BASE_URL = f"https://{GITHUB_USER}.github.io/{REPO_NAME}"
 
-# --- FONTES (Mantivemos sua lista completa) ---
+# --- FONTES COMPLETAS (Nexo, Valor, ONU, etc) ---
 FEEDS = {
     "GOIÁS (Política, Cotidiano)": [
         "https://g1.globo.com/rss/g1/goias/",
@@ -35,29 +35,29 @@ FEEDS = {
         "https://www.pciconcursos.com.br/feed"
     ],
     "BRASIL (Política, Economia, Social)": [
-        "https://rss.uol.com.br/feed/noticias.xml",
+        "https://pox.globo.com/rss/valor", 
+        "https://www.nexojornal.com.br/rss.xml",
+        "https://exame.com/feed/", 
+        "https://istoe.com.br/feed", 
+        "https://abes-dn.org.br/feed/", 
+        "https://www.opovo.com.br/rss/", 
         "https://feeds.folha.uol.com.br/poder/rss091.xml",
         "https://www.estadao.com.br/rss/politica",
         "https://www.cnnbrasil.com.br/feed/",
-        "https://www.brasil247.com/feed",
         "https://cartacapital.com.br/feed/",
         "https://agenciabrasil.ebc.com.br/rss/ultimas-noticias/feed.xml",
         "https://www.camara.leg.br/noticias/rss/ultimas-noticias",
-        "https://www12.senado.leg.br/noticias/feed/todas/rss",
-        "https://iclnoticias.com.br/feed/",
-        "https://veja.abril.com.br/feed/",
-        "https://exame.com/feed/",
-        "https://piaui.folha.uol.com.br/feed/",
-        "https://www.metropoles.com/feed"
+        "https://www12.senado.leg.br/noticias/feed/todas/rss"
     ],
-    "MUNDO (Geopolítica Profunda)": [
+    "MUNDO (Geopolítica Global)": [
+        "https://news.un.org/feed/subscribe/pt/news/all/rss.xml", 
         "https://brasil.elpais.com/rss/elpais/america.xml",      
         "https://www.bbc.com/portuguese/index.xml",              
         "https://rss.dw.com/xml/rss-br-all",                     
-        "https://news.un.org/feed/subscribe/pt/news/all/rss.xml", 
         "https://rss.nytimes.com/services/xml/rss/nyt/World.xml", 
         "https://www.theguardian.com/world/rss",
-        "https://www.clarin.com/rss/lo-ultimo/",
+        "https://www.aljazeera.com/xml/rss/all.xml",
+        "https://www.lemonde.fr/rss/une.xml",
         "https://pt.euronews.com/rss?format=xml"
     ],
     "CIÊNCIA, TECNOLOGIA E SAÚDE": [
@@ -72,10 +72,11 @@ FEEDS = {
     ]
 }
 
-# --- LINKS DO INMET/CLIMATEMPO (HTML) ---
+# --- LINKS ESPECIAIS (HTML) ---
 WEATHER_URLS = [
     "https://portal.inmet.gov.br/", 
-    "https://www.climatempo.com.br/previsao-do-tempo/15-dias/cidade/88/goiania-go"
+    "https://www.climatempo.com.br/previsao-do-tempo/15-dias/cidade/88/goiania-go",
+    "https://www.terra.com.br/noticias/"
 ]
 
 def get_data_ptbr():
@@ -84,42 +85,39 @@ def get_data_ptbr():
     meses = ['', 'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro']
     return f"{now.day} de {meses[now.month]}, uma {dias[now.weekday()]}"
 
-def get_weather_data():
-    text_data = "\n--- DADOS DE CLIMA (INMET/CLIMATEMPO) ---\n"
-    print("Consultando INMET...")
+def get_custom_data():
+    text_data = "\n--- DADOS EXTRAS (CLIMA/TERRA) ---\n"
+    print("Consultando INMET e Terra...")
     headers = {'User-Agent': 'Mozilla/5.0'}
     for url in WEATHER_URLS:
         try:
             req = urllib.request.Request(url, headers=headers)
             with urllib.request.urlopen(req) as response:
                 html = response.read().decode('utf-8')
-                # Pega mais conteúdo do HTML para garantir que pegamos a tabela
                 clean = re.sub(r'<[^>]+>', ' ', html)
                 clean = re.sub(r'\s+', ' ', clean)
-                text_data += f"Fonte ({url}): {clean[:5000]}...\n"
+                text_data += f"Fonte ({url}): {clean[:4000]}...\n"
         except: continue
     return text_data
 
 def get_news_summary():
     texto_final = ""
-    print("Coletando notícias (Modo Extenso)...")
+    print("Coletando notícias (Modo Ampliado)...")
     for categoria, urls in FEEDS.items():
         texto_final += f"\n--- {categoria} ---\n"
         for url in urls:
             try:
                 feed = feedparser.parse(url)
-                # AUMENTO DE VOLUME: 5 notícias por fonte
-                for entry in feed.entries[:5]:
+                # Pega 4 notícias por fonte e bastante texto para análise
+                for entry in feed.entries[:4]:
                     title = entry.title
-                    # Tenta pegar o conteúdo completo se disponível
                     content = entry.summary
                     if 'content' in entry:
                         content = entry.content[0].value
                     
-                    # AUMENTO DE LIMITE: 3000 caracteres por notícia (Contexto total)
-                    summary = re.sub(r'<[^>]+>', '', content)[:3000]
-                    
+                    summary = re.sub(r'<[^>]+>', '', content)[:2500]
                     published = entry.published if 'published' in entry else "Data Recente"
+                    
                     source_name = "Fonte"
                     if 'source' in entry: source_name = entry.source.title
                     elif 'feed' in feed and 'title' in feed.feed: source_name = feed.feed.title
@@ -127,7 +125,7 @@ def get_news_summary():
                     texto_final += f"[{source_name} | {published}] {title}: {summary}\n"
             except: continue
             
-    texto_final += get_weather_data()
+    texto_final += get_custom_data()
     return texto_final
 
 def clean_text_for_speech(text):
@@ -157,54 +155,51 @@ def make_script(news_text):
         model = genai.GenerativeModel(model_name)
         data_hoje_extenso = get_data_ptbr()
         
-        # --- PROMPT PARA PODCAST LONGO (10-15 MIN) ---
+        # --- PROMPT REAJUSTADO: MERCADO DA BOLA ATIVO MAS CONCISO ---
         prompt = f"""
-        ATUE COMO: Um analista sênior de notícias.
+        ATUE COMO: Um âncora de rádio sério, bem informado e analítico.
         OUVINTE: Yuri.
         DATA: {data_hoje_extenso}.
-        OBJETIVO: Criar um roteiro EXTENSO, PROFUNDO e ANALÍTICO (aprox. 2000 a 2500 palavras).
+        OBJETIVO: Resumo completo e profundo (10 a 15 minutos).
         
-        INSTRUÇÕES DE PERSONALIDADE:
-        - Fale naturalmente, sem citar "Bloco 1" ou "Vamos falar de...". Apenas mude de assunto suavemente.
-        - EXPLIQUE os fatos. Não diga apenas "o governo aprovou a lei". Diga "o governo aprovou a lei, o que significa que..."
-        - Use conectivos cultos: "Por outro lado", "Analisando o cenário", "Isso reflete diretamente em...".
+        DIRETRIZES DE ESTILO:
+        - Naturalidade total. Sem metalinguagem (não diga "agora o próximo bloco").
+        - Profundidade analítica em Política e Economia.
+        - Fale devagar e com clareza.
         
-        FILTRO RIGOROSO (SEGURANÇA):
-        - IGNORAR: Acidentes, mortes comuns, assaltos, fofocas e crimes irrelevantes.
-        - FOCO: Política, Economia, Decisões de Estado, Estratégia Esportiva, Inovação.
+        ROTEIRO OBRIGATÓRIO:
         
-        ROTEIRO OBRIGATÓRIO (Cubra TODOS com profundidade):
+        1. SAUDAÇÃO:
+           - "Olá, bom dia Yuri! Hoje é {data_hoje_extenso}."
         
-        1. ABERTURA:
-           - "Olá, bom dia Yuri! Hoje é {data_hoje_extenso}. Vamos à sua análise diária aprofundada."
+        2. CLIMA (GOIÂNIA):
+           - Dados do INMET/Climatempo: Temperatura, chuva, alertas.
         
-        2. CLIMA EM GOIÂNIA (INMET):
-           - Interprete os dados brutos abaixo. Dê a temperatura, chance de chuva e alertas meteorológicos.
+        3. ESPORTE (VILA NOVA & CRUZEIRO):
+           - Fale de resultados, tabelas e jogos.
+           - MERCADO DA BOLA: Pode falar sobre contratações e especulações fortes (quem chega, quem sai), mas seja OBJETIVO. Não delongue demais, apenas informe as movimentações relevantes e o impacto no time.
         
-        3. ESPORTE - VILA NOVA & CRUZEIRO (Muito Detalhe):
-           - Se a notícia for de ontem ou anteontem, traga ela e ANALISE o impacto.
-           - Fale de contratações, tática e bastidores do Tigrão e da Raposa.
+        4. GOIÁS E CIDADES:
+           - Política estadual/municipal, obras e serviços.
         
-        4. GOIÁS (Política e Social):
-           - Aprofunde nas decisões do Governo Estadual e Prefeitura de Goiânia. Obras, leis, saúde pública.
+        5. BRASIL (POLÍTICA, ECONOMIA, SOCIAL):
+           - Use fontes como Valor, Nexo, IstoÉ. Explique as intrigas do poder e o cenário econômico.
+           - Impacto na vida do cidadão.
         
-        5. BRASIL (Política & Economia):
-           - Analise as tensões entre os poderes.
-           - Explique os indicadores econômicos e o impacto no bolso.
+        6. MUNDO (GEOPOLÍTICA GLOBAL):
+           - Visão ampla (ONU, Al Jazeera, Le Monde). 
+           - Ásia, África, Europa e Américas.
         
-        6. MUNDO (Geopolítica Profunda):
-           - Detalhe conflitos (Ucrânia, Oriente Médio) e movimentos de grandes potências (EUA, China).
+        7. CIÊNCIA, SAÚDE & CULTURA:
+           - Inovações e descobertas relevantes.
         
-        7. CIÊNCIA, TECNOLOGIA & SAÚDE:
-           - Escolha um avanço relevante e explique.
-        
-        8. DESTAQUES DO YOUTUBE & CONCURSOS:
-           - Cite brevemente vídeos novos relevantes dos canais monitorados e concursos abertos.
+        8. OPORTUNIDADES:
+           - Concursos em destaque.
         
         9. DESPEDIDA:
-           - "Espero que tenha gostado desta análise completa, Yuri. Um ótimo dia e até amanhã!"
+           - "Espero que tenha gostado, Yuri. Um ótimo dia e até amanhã!"
         
-        DADOS BRUTOS (Use isso para criar sua análise):
+        DADOS BRUTOS:
         {news_text}
         """
         
@@ -231,7 +226,7 @@ def update_rss(audio_filename, title):
     rss_item = f"""
     <item>
       <title>{safe_title}</title>
-      <description>Edição Completa e Aprofundada para Yuri.</description>
+      <description>Edição Completa para Yuri (Fontes Novas).</description>
       <enclosure url="{audio_url}" type="audio/mpeg" />
       <guid isPermaLink="true">{audio_url}</guid>
       <pubDate>{now.strftime("%a, %d %b %Y %H:%M:%S %z")}</pubDate>
