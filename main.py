@@ -10,7 +10,7 @@ import re
 import urllib.request
 
 # --- CONFIGURAÇÕES DO USUÁRIO ---
-GITHUB_USER = "yurileonardos"
+GITHUB_USER = "shalomfernandes"
 REPO_NAME = "meu-podcast-diario"
 BASE_URL = f"https://{GITHUB_USER}.github.io/{REPO_NAME}"
 
@@ -23,11 +23,6 @@ FEEDS = {
         "https://opopular.com.br/rss",
         "https://diariodegoias.com.br/feed/",
         "https://ohoje.com/feed/"
-    ],
-    "ESPORTES (Vila Nova & Cruzeiro)": [
-        "https://ge.globo.com/rss/ge/futebol/times/vila-nova/",   
-        "https://ge.globo.com/rss/ge/futebol/times/cruzeiro/",
-        "https://www.maisgoias.com.br/category/esportes/vila-nova/feed/"
     ],
     "CONCURSOS": [
         "https://g1.globo.com/rss/g1/concursos-e-emprego/",
@@ -158,7 +153,7 @@ def make_script(news_text):
         # --- PROMPT REAJUSTADO: MERCADO DA BOLA ATIVO MAS CONCISO ---
         prompt = f"""
         ATUE COMO: Um âncora de rádio sério, bem informado e analítico.
-        OUVINTE: Yuri.
+        OUVINTE: Mara Rúbia.
         DATA: {data_hoje_extenso}.
         OBJETIVO: Resumo completo e profundo (10 a 15 minutos).
         
@@ -170,34 +165,30 @@ def make_script(news_text):
         ROTEIRO OBRIGATÓRIO:
         
         1. SAUDAÇÃO:
-           - "Olá, bom dia Yuri! Hoje é {data_hoje_extenso}."
+           - "Olá, bom dia Dra. Mara Rúbia! Hoje é {data_hoje_extenso}."
         
         2. CLIMA (GOIÂNIA):
            - Dados do INMET/Climatempo: Temperatura, chuva, alertas.
         
-        3. ESPORTE (VILA NOVA & CRUZEIRO):
-           - Fale de resultados, tabelas e jogos.
-           - MERCADO DA BOLA: Pode falar sobre contratações e especulações fortes (quem chega, quem sai), mas seja OBJETIVO. Não delongue demais, apenas informe as movimentações relevantes e o impacto no time.
-        
-        4. GOIÁS E CIDADES:
+        3. GOIÁS E CIDADES:
            - Política estadual/municipal, obras e serviços.
         
-        5. BRASIL (POLÍTICA, ECONOMIA, SOCIAL):
+        4. BRASIL (POLÍTICA, ECONOMIA, SOCIAL):
            - Use fontes como Valor, Nexo, IstoÉ. Explique as intrigas do poder e o cenário econômico.
            - Impacto na vida do cidadão.
         
-        6. MUNDO (GEOPOLÍTICA GLOBAL):
+        5. MUNDO (GEOPOLÍTICA GLOBAL):
            - Visão ampla (ONU, Al Jazeera, Le Monde). 
            - Ásia, África, Europa e Américas.
         
-        7. CIÊNCIA, SAÚDE & CULTURA:
+        6. CIÊNCIA, SAÚDE & CULTURA:
            - Inovações e descobertas relevantes.
         
-        8. OPORTUNIDADES:
+        7. OPORTUNIDADES:
            - Concursos em destaque.
         
-        9. DESPEDIDA:
-           - "Espero que tenha gostado, Yuri. Um ótimo dia e até amanhã!"
+        8. DESPEDIDA:
+           - "Espero que tenha gostado, Dra. Mara Rúbia. Um ótimo dia e até amanhã!"
         
         DADOS BRUTOS:
         {news_text}
