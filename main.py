@@ -214,27 +214,48 @@ def update_rss(audio_filename, title):
     
     safe_title = escape(title).replace("&", "e") 
     
+    # Novo item RSS
     rss_item = f"""
     <item>
       <title>{safe_title}</title>
-      <description>Edição Completa para Yuri (Fontes Novas).</description>
+      <description>Edição Completa - Resumo diário de notícias.</description>
       <enclosure url="{audio_url}" type="audio/mpeg" />
       <guid isPermaLink="true">{audio_url}</guid>
       <pubDate>{now.strftime("%a, %d %b %Y %H:%M:%S %z")}</pubDate>
     </item>
     """
     
+    # Tenta ler o feed existente para manter histórico
+    existing_items = []
+    if os.path.exists(rss_file):
+        try:
+            with open(rss_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+                # Extrai itens existentes (mantém apenas os últimos 9 para ter no máximo 10)
+                items = re.findall(r'<item>.*?</item>', content, re.DOTALL)
+                existing_items = items[:9]  # Mantém os 9 mais recentes
+        except:
+            pass
+    
+    # Cabeçalho do RSS
     header = f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
   <channel>
-    <title>Resumo Diario do Yuri</title>
-    <description>Notícias aprofundadas.</description>
+    <title>Meu Podcast Diário</title>
+    <description>Resumo diário de notícias consolidado e narrado em áudio.</description>
     <link>{BASE_URL}</link>
     <language>pt-br</language>
     <itunes:image href="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/640px-Flag_of_Brazil.svg.png"/>
+    <itunes:category text="News"/>
 """
+    
+    # Escreve o feed com o novo item primeiro, depois os antigos
     with open(rss_file, 'w', encoding='utf-8') as f:
-        f.write(header + rss_item + "\n  </channel>\n</rss>")
+        f.write(header)
+        f.write(rss_item)
+        for item in existing_items:
+            f.write("\n    " + item)
+        f.write("\n  </channel>\n</rss>")
 
 if __name__ == "__main__":
     news = get_news_summary()
