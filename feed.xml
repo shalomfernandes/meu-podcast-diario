@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
   <channel>
-    <title>Resumo Diario do Yuri</title>
-    <description>Notícias aprofundadas.</description>
-    <link>https://yurileonardos.github.io/meu-podcast-diario</link>
+    <title>Meu Podcast Diário</title>
+    <description>Resumo diário de notícias consolidado e narrado em áudio.</description>
+    <link>https://shalomfernandes.github.io/meu-podcast-diario</link>
     <language>pt-br</language>
     <itunes:image href="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/640px-Flag_of_Brazil.svg.png"/>
+    <itunes:category text="News"/>
 
+    <item>
+      <title>Resumo 12/12</title>
+      <description>Edição Completa - Resumo diário de notícias.</description>
+      <enclosure url="https://shalomfernandes.github.io/meu-podcast-diario/podcast_20251212.mp3" type="audio/mpeg" />
+      <guid isPermaLink="true">https://shalomfernandes.github.io/meu-podcast-diario/podcast_20251212.mp3</guid>
+      <pubDate>Fri, 12 Dec 2025 23:49:09 -0300</pubDate>
+    </item>
+    
     <item>
       <title>Resumo 12/12</title>
       <description>Edição Completa para Yuri (Fontes Novas).</description>
@@ -14,6 +23,5 @@
       <guid isPermaLink="true">https://yurileonardos.github.io/meu-podcast-diario/podcast_20251212.mp3</guid>
       <pubDate>Fri, 12 Dec 2025 07:01:45 -0300</pubDate>
     </item>
-    
   </channel>
 </rss>
