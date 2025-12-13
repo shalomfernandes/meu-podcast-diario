@@ -13,6 +13,8 @@ import urllib.request
 GITHUB_USER = "shalomfernandes"
 REPO_NAME = "meu-podcast-diario"
 BASE_URL = f"https://{GITHUB_USER}.github.io/{REPO_NAME}"
+PODCAST_AUTHOR = "Shalom Fernandes"
+PODCAST_EMAIL = "shalomfernandes@gmail.com"
 
 # --- FONTES COMPLETAS (Nexo, Valor, ONU, etc) ---
 FEEDS = {
@@ -245,6 +247,12 @@ def update_rss(audio_filename, title):
     <description>Resumo diário de notícias consolidado e narrado em áudio.</description>
     <link>{BASE_URL}</link>
     <language>pt-br</language>
+    <managingEditor>{PODCAST_EMAIL} ({PODCAST_AUTHOR})</managingEditor>
+    <itunes:author>{PODCAST_AUTHOR}</itunes:author>
+    <itunes:owner>
+      <itunes:name>{PODCAST_AUTHOR}</itunes:name>
+      <itunes:email>{PODCAST_EMAIL}</itunes:email>
+    </itunes:owner>
     <itunes:image href="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/640px-Flag_of_Brazil.svg.png"/>
     <itunes:category text="News"/>
 """
