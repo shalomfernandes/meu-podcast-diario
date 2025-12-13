@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
   <channel>
-    <title>Resumo Diario do Shalom</title>
+    <title>Meu Podcast Diário</title>
     <description>Resumo diário de notícias consolidado e narrado em áudio.</description>
     <link>https://shalomfernandes.github.io/meu-podcast-diario</link>
     <language>pt-br</language>
@@ -14,6 +14,14 @@
     <itunes:image href="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Flag_of_Brazil.svg/640px-Flag_of_Brazil.svg.png"/>
     <itunes:category text="News"/>
 
+    <item>
+      <title>Resumo 13/12</title>
+      <description>Edição Completa - Resumo diário de notícias.</description>
+      <enclosure url="https://shalomfernandes.github.io/meu-podcast-diario/podcast_20251213.mp3" type="audio/mpeg" />
+      <guid isPermaLink="true">https://shalomfernandes.github.io/meu-podcast-diario/podcast_20251213.mp3</guid>
+      <pubDate>Sat, 13 Dec 2025 00:28:21 -0300</pubDate>
+    </item>
+    
     <item>
       <title>Resumo 12/12</title>
       <description>Edição Completa - Resumo diário de notícias.</description>
