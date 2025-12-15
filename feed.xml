@@ -15,13 +15,20 @@
     <itunes:category text="News"/>
 
     <item>
+      <title>Resumo 15/12</title>
+      <description>Edição Completa - Resumo diário de notícias.</description>
+      <enclosure url="https://shalomfernandes.github.io/meu-podcast-diario/podcast_20251215.mp3" type="audio/mpeg" />
+      <guid isPermaLink="true">https://shalomfernandes.github.io/meu-podcast-diario/podcast_20251215.mp3</guid>
+      <pubDate>Mon, 15 Dec 2025 07:07:50 -0300</pubDate>
+    </item>
+    
+    <item>
       <title>Resumo 14/12</title>
       <description>Edição Completa - Resumo diário de notícias.</description>
       <enclosure url="https://shalomfernandes.github.io/meu-podcast-diario/podcast_20251214.mp3" type="audio/mpeg" />
       <guid isPermaLink="true">https://shalomfernandes.github.io/meu-podcast-diario/podcast_20251214.mp3</guid>
       <pubDate>Sun, 14 Dec 2025 06:57:47 -0300</pubDate>
     </item>
-    
     <item>
       <title>Resumo 13/12</title>
       <description>Edição Completa - Resumo diário de notícias.</description>
