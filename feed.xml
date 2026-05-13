@@ -15,13 +15,20 @@
     <itunes:category text="News"/>
 
     <item>
+      <title>Resumo 13/05</title>
+      <description>Edição Completa - Resumo diário de notícias.</description>
+      <enclosure url="https://shalomfernandes.github.io/meu-podcast-diario/podcast_20260513.mp3" type="audio/mpeg" />
+      <guid isPermaLink="true">https://shalomfernandes.github.io/meu-podcast-diario/podcast_20260513.mp3</guid>
+      <pubDate>Wed, 13 May 2026 08:55:10 -0300</pubDate>
+    </item>
+    
+    <item>
       <title>Resumo 12/05</title>
       <description>Edição Completa - Resumo diário de notícias.</description>
       <enclosure url="https://shalomfernandes.github.io/meu-podcast-diario/podcast_20260512.mp3" type="audio/mpeg" />
       <guid isPermaLink="true">https://shalomfernandes.github.io/meu-podcast-diario/podcast_20260512.mp3</guid>
       <pubDate>Tue, 12 May 2026 08:47:25 -0300</pubDate>
     </item>
-    
     <item>
       <title>Resumo 11/05</title>
       <description>Edição Completa - Resumo diário de notícias.</description>
@@ -77,13 +84,6 @@
       <enclosure url="https://shalomfernandes.github.io/meu-podcast-diario/podcast_20260504.mp3" type="audio/mpeg" />
       <guid isPermaLink="true">https://shalomfernandes.github.io/meu-podcast-diario/podcast_20260504.mp3</guid>
       <pubDate>Mon, 04 May 2026 08:34:50 -0300</pubDate>
-    </item>
-    <item>
-      <title>Resumo 03/05</title>
-      <description>Edição Completa - Resumo diário de notícias.</description>
-      <enclosure url="https://shalomfernandes.github.io/meu-podcast-diario/podcast_20260503.mp3" type="audio/mpeg" />
-      <guid isPermaLink="true">https://shalomfernandes.github.io/meu-podcast-diario/podcast_20260503.mp3</guid>
-      <pubDate>Sun, 03 May 2026 07:41:55 -0300</pubDate>
     </item>
   </channel>
 </rss>
